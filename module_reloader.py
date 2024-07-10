@@ -8,6 +8,11 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class LoadedModuleInfo:
@@ -45,6 +50,14 @@ def reload_module(module_name: str) -> None:
     if module_name in sys.modules:
         importlib.reload(sys.modules[module_name])
         update_module_load_time(module_name)
+
+
+def reload_module_by_path(module_path: str) -> None:
+    for module_name, info in loaded_modules.items():
+        if info.path == module_path:
+            reload_module(module_name)
+            return
+    logger.error(f"No module found with path '{module_path}'")
 
 
 def get_stale_modules() -> List[str]:
