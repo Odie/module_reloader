@@ -89,39 +89,3 @@ class CustomImportFinder(importlib.abc.MetaPathFinder):
 
 # Insert the custom import finder into the meta path
 sys.meta_path.insert(0, CustomImportFinder())
-
-# Example usage
-if __name__ == "__main__":
-    print("---------- Creating ModuleA.hello_world() ----------")
-    with open("ModuleA.py", "w") as f:
-        f.write("def hello_world():\n")
-        f.write('    print("Hello, world!")\n')
-
-    import ModuleA  # This will be tracked automatically
-    from ModuleA import hello_world
-
-    print("Loaded modules:", get_loaded_modules())
-    print("")
-
-    print("---------- Calling ModuleA.hello_world() ----------")
-    ModuleA.hello_world()
-    print("\n")
-
-    # Simulate modifying ModuleA.py and then reloading stale modules
-    print("---------- Modifying ModuleA.hello_world() ----------")
-    with open("ModuleA.py", "w") as f:
-        f.write("def hello_world():\n")
-        f.write('    print("Hello, new world!")\n')
-
-    print("---------- Checking stale modules ----------")
-    stale = get_stale_modules()
-    print("Stale modules:", stale)
-    print("")
-
-    print("---------- Reloading ModuleA ----------")
-    reload_module("ModuleA")
-    print("")
-
-    print("---------- Calling ModuleA.hello_world() ----------")
-    ModuleA.hello_world()
-    print("")
