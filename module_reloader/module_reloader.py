@@ -27,7 +27,7 @@ loaded_modules: Dict[str, LoadedModuleInfo] = {}
 
 def track_module(spec: importlib.machinery.ModuleSpec) -> None:
     # If we haven't been tracking this module before...
-    if spec.name not in loaded_modules:
+    if spec.name not in loaded_modules and spec.origin:
         assert spec.origin
 
         # Setup an entry to track this module...
@@ -63,7 +63,11 @@ def reload_module_by_path(module_path: str) -> None:
 def get_stale_modules() -> List[str]:
     stale_modules = []
     for module_name, info in loaded_modules.items():
-        module_file = sys.modules[module_name].__file__
+        try:
+            module_file = sys.modules[module_name].__file__
+        except (KeyError, AttributeError):
+            continue
+
         if module_file:
             mod_time = os.path.getmtime(module_file)
             if mod_time > info.load_time:
